@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This Google Mobile Ads plugin library manifest will get merged with your
+application's manifest, adding the necessary activity and permissions
+required for displaying ads.
+<intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter> 
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.google.unity.ads"
+    android:versionName="1.0"
+    android:versionCode="1">
+  <uses-sdk android:minSdkVersion="16"
+      android:targetSdkVersion="28" />
+  <application>
+
+    <activity android:name="com.unity3d.player.UnityPlayerNativeActivity"
+    android:label="@string/app_name">
+      
+      
+      <meta-data android:name="unityplayer.UnityActivity" android:value="true" />
+      <meta-data android:name="unityplayer.ForwardNativeEventsToDalvik"
+          android:value="true" />
+    </activity>
+  </application>
+</manifest>
