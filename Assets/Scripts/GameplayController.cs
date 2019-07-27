@@ -4,152 +4,87 @@ using UnityEngine.UI;
 
 public class GameplayController : MonoBehaviour
 {
-    public static float reactTime = 0.8f; //Time for reation for each level
-    private const int blocksIncSpeed = 5; //Blocks before
-    private const int resizeFactor = 7; //  Arrange factor
-
-    public GameObject blockPrefab; //       Base prefab
-    public GameObject blockPrefabParent; // The Gameobjects Parent
-    public Sprite[] blockBackgrounds; //    All backgrounds
-    public Image targetImage; //            The center image frame
-    public Text highScore; //               Highscore text
-    public Text score; //                   Score text
-    public GameObject endPopup; //          Endgame popup
-    public GameObject mainMenu; //          Menu
-    public GameObject quitPopup; //         Quit app popup
+    private const float reactTime = 0.8f; //     Time for reation for each level
+    private const int blocksIncSpeed = 5; //     Blocks before
+    private const int resizeFactor = 7; //       Arrange factor
+    private const int adSessionsToShow = 25;//   Amount of sessions played after which the full screen ad is shown
 
     private readonly System.Random randomGenerator; // Random generator
     // Device screen size
-    private readonly int screenHeight; 
+    private readonly int screenHeight;
     private readonly int screenWidth;
+
+    [Header("Referances")]
+    [SerializeField]
+    private GameObject blockPrefab; //            Base prefab
+
+    [SerializeField]
+    private GameObject blockPrefabParent; //      The Gameobjects Parent
+
+    [SerializeField]
+    private Sprite[] blockBackgrounds; //         All backgrounds
+
+    [SerializeField]
+    private Image targetImage; //                 The center image frame
+
+    [SerializeField]
+    private Text highScore; //                    Highscore text
+
+    [SerializeField]
+    private Text score; //                        Score text
+
+    [SerializeField]
+    private GameObject endPopup; //               Endgame popup
+
+    [SerializeField]
+    private GameObject mainMenu; //               Menu
+
+    [SerializeField]
+    private GameObject quitPopup; //              Quit app popup
 
     // Vectors used for setting the block's place
     private Vector2 offset;
     private Vector2 StartPoint;
     private Vector2 EndPoint;
 
-    private float reactTimer; //                 Timer
-    private int levelCount; //                   Current level count
-    private int sessionsCount; //                Played games (sessions) count
-    private List<Level> levels; //               Levels
-    private List<GameObject> blocksInstances; // Blocks
-    public bool quitState; //                    Quit state
     private bool inGame; //                      Ingame State
-
-    public bool InGame
-    {
-        get {
-            return inGame;
-        }
-        set
-        {
-            inGame = value;
-        }
-    }
-
-    public int LevelCount
-    {
-        get
-        {
-            return levelCount;
-        }
-
-        set
-        {
-            levelCount = value;
-        }
-    }
-
-    public bool QuitState
-    {
-        get
-        {
-            return quitState;
-        }
-        set
-        {
-            quitState = value;
-        }
-    }
-
-    public List<Level> Levels
-    {
-        get
-        {
-            return levels;
-        }
-        set
-        {
-            levels = value;
-        }
-    }
-
-    public float ReactTimer
-    {
-        get
-        {
-            return reactTimer;
-        }
-        set
-        {
-            reactTimer = value;
-        }
-    }
-
-    public List<GameObject> BlocksInstances
-    {
-        get
-        {
-            return this.blocksInstances;
-        }
-        set
-        {
-            blocksInstances = value;
-        }
-    }
-
-    public int SessionsCount
-    {
-        get
-        {
-            return sessionsCount;
-        }
-        set
-        {
-            sessionsCount = value;
-        }
-    }
+    private int levelCount; //                   Current level count
+    private bool quitState; //                   Quit state
+    private List<Level> levels; //               Levels
+    private float reactTimer; //                 Timer
+    private List<GameObject> blocksInstances; // Blocks
+    private int sessionsCount; //                Played games (sessions) count
 
     public GameplayController()
     {
         // Init the values
         screenHeight = UnityEngine.Screen.height;
         screenWidth = UnityEngine.Screen.width;
-        Levels = new List<Level>();
-        BlocksInstances = new List<GameObject>();
+        levels = new List<Level>();
+        blocksInstances = new List<GameObject>();
         randomGenerator = new System.Random();
         StartPoint = new Vector2();
         EndPoint = new Vector2();
-        ReactTimer = int.MaxValue;
-        LevelCount = 1;
-        InGame = true;
+        reactTimer = int.MaxValue;
+        levelCount = 1;
+        inGame = true;
     } 
 
     void Start ()
     {
         // Init the settings
-        QuitState = true;
-        GenerateLevel(LevelCount);
-        LoadLevel(LevelCount);
-        SessionsCount = PlayerPrefs.GetInt(PrefsConst.SessionsCount, 0);
+        quitState = true;
+        GenerateLevel(levelCount);
+        LoadLevel(levelCount);
+        sessionsCount = PlayerPrefs.GetInt(PrefsConst.SessionsCount, 0);
         GoogleMobileAdsImplementation.instance.RequestInterstitial();
     }
 
     void FixedUpdate ()
     {
         // Decrease the timer and end the game if it's 0
-        ReactTimer -= Time.deltaTime;
-        if (ReactTimer <= 0 && InGame)
+        reactTimer -= Time.deltaTime;
+        if (reactTimer <= 0 && inGame)
         {
             GameOver();
         }
@@ -173,7 +108,7 @@ public class GameplayController : MonoBehaviour
             for (int j = 0, n = (crntLevel + blocksIncSpeed - 2 )/ blocksIncSpeed; j < n; j++) 
             {
                 // Generate the block's size
-                procentage = randomGenerator.Next( (95 /((LevelCount/ blocksIncSpeed)+2)) + j * resizeFactor, (101/((LevelCount/ blocksIncSpeed)+2)) + j* resizeFactor);
+                procentage = randomGenerator.Next( (95 /((levelCount/ blocksIncSpeed)+2)) + j * resizeFactor, (101/((levelCount/ blocksIncSpeed)+2)) + j* resizeFactor);
                 Block block = new Block();
                 // Randomly setting the block's possition and background
                 if (procentage % 2 == 0)
@@ -227,7 +162,7 @@ public class GameplayController : MonoBehaviour
         int randValue = randomGenerator.Next(0, value+1);
         level.LevelValue = randValue;
         targetImage.sprite = blockBackgrounds[randValue];
-        Levels.Add(level);
+        levels.Add(level);
     }
 
     private void LoadLevel(int level)
@@ -249,7 +184,7 @@ public class GameplayController : MonoBehaviour
             blockTranform.SetSiblingIndex(2);
             blockInstance.GetComponent<BlockPrefab>().Value = levels[level - 1].Blocks[i].Value; 
             blockTranform.sizeDelta = new Vector2(levels[level-1].Blocks[i].Width, levels[level - 1].Blocks[i].Height);
-            BlocksInstances.Add(blockInstance);
+            blocksInstances.Add(blockInstance);
         }
     }
 
@@ -298,14 +233,14 @@ public class GameplayController : MonoBehaviour
     public void onBlockClicked(BlockPrefab blockPrefab)
     {
         // Trigger when Block is clicked
-        if (InGame)
+        if (inGame)
         {
-            if (blockPrefab.Value == Levels[levelCount - 1].LevelValue)
+            if (blockPrefab.Value == levels[levelCount - 1].LevelValue)
             {
                 MusicController.Instance.rightSound.Play();
-                LevelCount++;
-                ReactTimer = reactTime;
-                NextLevel(LevelCount);
+                levelCount++;
+                reactTimer = reactTime;
+                NextLevel(levelCount);
             }
             else
             {
@@ -326,40 +261,41 @@ public class GameplayController : MonoBehaviour
     private void DestroyBlocks()
     {
         // Destroy the blocks
-        for (int i = 0, n = BlocksInstances.Count; i < n; i++)
+        for (int i = 0, n = blocksInstances.Count; i < n; i++)
         {
-            Destroy(BlocksInstances[i]);
+            Destroy(blocksInstances[i]);
         }
     }
 
     private void GameOver()
     {
         // Increase and merge the sessions count
-        SessionsCount++;
-        PlayerPrefs.SetInt(PrefsConst.SessionsCount, SessionsCount);
+        sessionsCount++;
+        PlayerPrefs.SetInt(PrefsConst.SessionsCount, sessionsCount);
 
         // Show the fullscrean AD on every 25th session
-        if (SessionsCount % 25 == 0)
+        if (sessionsCount % adSessionsToShow == 0)
         {   
             GoogleMobileAdsImplementation.instance.ShowInterstitial();
         }
-        else if (SessionsCount % 24 == 0)
+        // Prepare the add to be shown
+        else if (sessionsCount % adSessionsToShow - 1 == 0)
         {
             GoogleMobileAdsImplementation.instance.RequestInterstitial();
         }
 
-        InGame = false;
+        inGame = false;
         // Set the text and show in the endgame popup
-        score.text = "Score " + (LevelCount-1).ToString();
+        score.text = "Score " + (levelCount-1).ToString();
         mainMenu.SetActive(true);
-        if (PlayerPrefs.GetInt(PrefsConst.Score, 0) < LevelCount - 1)
+        if (PlayerPrefs.GetInt(PrefsConst.Score, 0) < levelCount - 1)
         {
             // Set the new highscore
-            PlayerPrefs.SetInt(PrefsConst.Score, LevelCount-1);
+            PlayerPrefs.SetInt(PrefsConst.Score, levelCount-1);
         }
         highScore.text = "Record " + PlayerPrefs.GetInt(PrefsConst.Score).ToString();
         endPopup.SetActive(true);
-        QuitState = false;
+        quitState = false;
         GoogleMobileAdsImplementation.instance.RequestBanner();
     }
 
@@ -382,13 +318,13 @@ public class GameplayController : MonoBehaviour
         GoogleMobileAdsImplementation.instance.HideBanner();
         DestroyBlocks();
         ClosePopups();
-        Levels.Clear();
-        LevelCount = 1;
-        ReactTimer = int.MaxValue;
-        GenerateLevel(LevelCount);
-        LoadLevel(LevelCount);
-        QuitState = true;
-        InGame = true;
+        levels.Clear();
+        levelCount = 1;
+        reactTimer = int.MaxValue;
+        GenerateLevel(levelCount);
+        LoadLevel(levelCount);
+        quitState = true;
+        inGame = true;
     }
 
     private void ClosePopups()
@@ -402,8 +338,8 @@ public class GameplayController : MonoBehaviour
     {
         // Close the quit Popup
         ClosePopups();
-        endPopup.SetActive(!InGame);
-        QuitState = true;
+        endPopup.SetActive(!inGame);
+        quitState = true;
     }
 
     public void OpenQuitPopup()
@@ -411,8 +347,8 @@ public class GameplayController : MonoBehaviour
         // Open the quit Popup and show the banner AD
         ClosePopups();
         quitPopup.SetActive(true);
-        QuitState = false;
-        InGame = false;
+        quitState = false;
+        inGame = false;
         GoogleMobileAdsImplementation.instance.RequestBanner();
     }
 
@@ -420,17 +356,17 @@ public class GameplayController : MonoBehaviour
     {
         // Call when back button is pressed
         // Close the popups | open the quit popup | quit the game
-        if (QuitState && (!InGame || LevelCount == 1))
+        if (quitState && (!inGame || levelCount == 1))
         {
             OpenQuitPopup();
         }
-        else if (LevelCount == 1)
+        else if (levelCount == 1)
         {
             ClosePopups();
-            QuitState = true;
-            InGame = true;
+            quitState = true;
+            inGame = true;
         }
-        else if(!InGame)
+        else if(!inGame)
         {
             RestartGame();
         }

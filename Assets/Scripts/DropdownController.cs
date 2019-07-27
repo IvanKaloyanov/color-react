@@ -34,7 +34,5 @@ public class DropdownController : MonoBehaviour {
             Debug.Log(scale.y.ToString());
             yield return null;
         } while (scale.y < 0.98f && scale.y > -0.5f);
-
     }
-
 }

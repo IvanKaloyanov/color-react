@@ -2,19 +2,24 @@
 using UnityEngine.UI;
 
 public class SoundButton : MonoBehaviour {
+
     // Sound menu controller
+    [Header("Referances")]
+    [SerializeField]
+    public Image musicIcon;     // icon
 
-    public Image musicIcon; // icon
-    public Image musicOnIcon; // onImage
-    public Image musicOffIcon; // offImage
+    [SerializeField]
+    public Image musicOnIcon;   // onImage
 
-    public bool mute;
-    private const string ppValue = "mute";
+    [SerializeField]
+    public Image musicOffIcon;  // offImage
+
+    private bool mute;          // mute flag
 
     private void Start()
     {
         // Set the user's settings
-        mute = bool.Parse(PlayerPrefs.GetString(ppValue, false.ToString()));
+        mute = bool.Parse(PlayerPrefs.GetString(PrefsConst.Mute, false.ToString()));
         MusicController.Instance.wrongSound.mute = mute;
         MusicController.Instance.rightSound.mute = mute;
         musicIcon.sprite = mute ? musicOffIcon.sprite : musicOnIcon.sprite;
@@ -27,6 +32,6 @@ public class SoundButton : MonoBehaviour {
         MusicController.Instance.wrongSound.mute = mute;
         MusicController.Instance.rightSound.mute = mute;
         musicIcon.sprite = mute ? musicOffIcon.sprite : musicOnIcon.sprite;
-        PlayerPrefs.SetString(ppValue, mute.ToString());
+        PlayerPrefs.SetString(PrefsConst.Mute, mute.ToString());
     }
 }

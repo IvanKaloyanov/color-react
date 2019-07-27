@@ -4,7 +4,7 @@ public class BackButton : MonoBehaviour {
 
     private GameplayController controller;
 
-    public GameplayController Controller
+    private GameplayController Controller
     {
         get
         {

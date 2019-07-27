@@ -4,20 +4,7 @@ public class BlockPrefab : MonoBehaviour
 {
     // Block gameObject used as component in the engine
 
-    private int value; // Value for comparison
-
-    public int Value
-    {
-        get
-        {
-            return value;
-        }
-
-        set
-        {
-            this.value = value;
-        }
-    }
+    public int Value { get; set; } // Value for comparison
 
     public void OnBlockPrefabClicked()
     {

@@ -4,23 +4,11 @@ public class Quit : MonoBehaviour {
 
     private GameplayController controller;
 
-    public GameplayController Controller
-    {
-        get
-        {
-            return controller;
-        }
-        set
-        {
-            controller = value;
-        }
-    }
-
     void Start()
     {
         // Initialize the controller
         GameObject controllerInstance = GameObject.FindGameObjectWithTag(TagsConst.GameController);
-        Controller = controllerInstance.GetComponent<GameplayController>();
+        controller = controllerInstance.GetComponent<GameplayController>();
     }
 
     public void OnQuitClicked()
@@ -32,7 +20,6 @@ public class Quit : MonoBehaviour {
     public void OnRefuseQuitClicked()
     {
         // Reject quiting
-        Controller.CloseQuitPopup();
+        controller.CloseQuitPopup();
     }
-
 }
